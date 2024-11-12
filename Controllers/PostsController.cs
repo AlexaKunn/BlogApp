@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BlogApp.Data;
+using BlogApp.Models;
 
 namespace BlogApp.Controllers
 {
@@ -21,25 +17,48 @@ namespace BlogApp.Controllers
         // GET: Posts
         public async Task<IActionResult> Index()
         {
+
             return View(await _context.Posts.ToListAsync());
         }
 
         // GET: Posts/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            //if (id == null)
+            //{
+            //    return NotFound();
+            //}
 
-            var post = await _context.Posts
-                .FirstOrDefaultAsync(m => m.Id == id);
+
+
+            //var post = await _context.Posts
+            //    .FirstOrDefaultAsync(m => m.Id == id);
+ 
+
+            //return View(post);
+
+           var post = await _context.Posts.Where(x => x.Id == id).Select(post => new Post()
+            {
+                Id = post.Id,
+                Body = post.Body,
+                Created = post.Created,
+                ImagePath = post.ImagePath,
+                Gallery = post.Gallery.Select(g => new Gallery()
+                {
+                    Id = g.Id,
+                    Name = g.Name,
+                    URL = g.URL
+
+
+                }).ToList()
+            }).FirstOrDefaultAsync();
+
             if (post == null)
             {
                 return NotFound();
             }
-
             return View(post);
+           
         }
 
         //// GET: Posts/Create

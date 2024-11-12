@@ -11,7 +11,13 @@ namespace BlogApp.Models
         public IFormFile Image { get; set; }
 
         public string ImagePath { get; set; }
+
+        [NotMapped]
+        public IFormFileCollection GalleryFiles { get; set; }
         public DateTime Created { get; set; } = DateTime.Now;
 
+        public List<Gallery> Gallery { get; set; } 
+
+        
     }
 }

@@ -9,6 +9,8 @@ using BlogApp.Data;
 using BlogApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Drawing;
+using BlogApp.Data.Migrations;
+using Microsoft.Extensions.Primitives;
 
 namespace BlogApp.Controllers
 {
@@ -48,7 +50,27 @@ namespace BlogApp.Controllers
                 return NotFound();
             }
 
+
+
             return View(post);
+
+#pragma warning disable CS8603 // Possible null reference return.
+            //return await _context.Posts.Where(x => x.Id == id).Select(post => new Post()
+            //{
+            //    Id = post.Id,
+            //    Body = post.Body,
+            //    Created = post.Created,
+            //    ImagePath = post.ImagePath,
+            //    Gallery = post.Gallery.Select(g => new Gallery()
+            //    {
+            //        Id = g.Id,
+            //        Name = g.Name,
+            //        URL = g.URL
+
+
+            //    }).ToList()
+            //}).FirstOrDefaultAsync();
+#pragma warning restore CS8603 // Possible null reference return.
         }
 
         // GET: Admin/Create
@@ -62,7 +84,7 @@ namespace BlogApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Body,Image,ImagePath,Created")] Post post )
+        public async Task<IActionResult> Create([Bind("Id,Title,Body,Image,ImagePath,GalleryFiles,Created")] Post post )
         {
             ModelState.Clear();
             
@@ -72,38 +94,57 @@ namespace BlogApp.Controllers
                 if (post.Image != null )
                 {
                     string folder = "uploads/blog/";
-                    folder += Guid.NewGuid().ToString() + "_" + post.Image.FileName;
 
-                    post.ImagePath = folder;
+                    post.ImagePath = await UploadImage(folder,post.Image);
 
-                    string serverFolder = Path.Combine(this.webHostEnvironment.WebRootPath, folder);
 
-                    await post.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
+
 
                 }
 
+                if (post.GalleryFiles != null)
+                {
+                    string folder = "uploads/blogGallery/";
+
+                    post.Gallery = new List<Gallery>();
+
+
+                    foreach (var file in post.GalleryFiles)
+                    {
+                        var galllery = new Gallery()
+                        {
+                            Name = file.Name,
+                            URL = await UploadImage(folder, file)
+                        };
+                        post.Gallery.Add(galllery);
+
+                    }
+
+
+                }
                 _context.Add(post);
                 await _context.SaveChangesAsync();
+
+
+
                 return RedirectToAction(nameof(Index));
             }
             return View(post);
         }
 
-        [HttpPost("upload")]
-        public async Task<IActionResult> UploadFile(IFormFile file)
+
+        private async Task<string> UploadImage(string folderPath,IFormFile file)
         {
-            if (file == null || file.Length == 0)
-                return BadRequest("No file uploaded.");
+            folderPath += Guid.NewGuid().ToString() + "_" + file.FileName;
 
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", file.FileName);
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
+            string serverFolder = Path.Combine(this.webHostEnvironment.WebRootPath, folderPath);
 
-            return Ok(new { filePath });
+            await file.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
+
+            return folderPath;
         }
+
 
         // GET: Admin/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -127,7 +168,7 @@ namespace BlogApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Body,Image,ImagePath,Created")] Post post)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Body,Image,ImagePath,GalleryFiles,Created")] Post post)
         {
             if (id != post.Id)
             {
@@ -141,15 +182,35 @@ namespace BlogApp.Controllers
                 if (post.Image != null)
                 {
                     string folder = "uploads/blog/";
-                    folder += Guid.NewGuid().ToString() + "_" + post.Image.FileName;
 
-                    post.ImagePath = folder;
+                    post.ImagePath = await UploadImage(folder, post.Image);
 
-                    string serverFolder = Path.Combine(this.webHostEnvironment.WebRootPath, folder);
 
-                    await post.Image.CopyToAsync(new FileStream(serverFolder, FileMode.Create));
+
 
                 }
+
+                if (post.GalleryFiles != null)
+                {
+                    string folder = "uploads/blogGallery/";
+
+                    post.Gallery = new List<Gallery>();
+
+
+                    foreach (var file in post.GalleryFiles)
+                    {
+                        var galllery = new Gallery()
+                        {
+                            Name = file.Name,
+                            URL = await UploadImage(folder, file)
+                        };
+                        post.Gallery.Add(galllery);
+
+                    }
+
+
+                }
+
 
                 try
                 {
