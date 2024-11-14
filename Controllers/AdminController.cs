@@ -38,6 +38,8 @@ namespace BlogApp.Controllers
         // GET: Admin/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+           
+
             if (id == null)
             {
                 return NotFound();
@@ -160,6 +162,8 @@ namespace BlogApp.Controllers
             {
                 return NotFound();
             }
+            //System.Diagnostics.Debug.WriteLine(post);
+
             return View(post);
         }
 
@@ -168,9 +172,40 @@ namespace BlogApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Body,Image,ImagePath,GalleryFiles,Created")] Post post)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Body,Image,ImagePath,GalleryFiles,Latitude,Longitude,Created")] Post post)
         {
-            if (id != post.Id)
+            var get_details = await _context.Posts.Where(x => x.Id == id).Select(post => new Post()
+            {
+                Id = post.Id,
+                Body = post.Body,
+                Created = post.Created,
+                ImagePath = post.ImagePath,
+                Latitude = post.Latitude,
+                Longitude = post.Longitude, 
+                Gallery = post.Gallery.Select(g => new Gallery()
+                {
+                    Id = g.Id,
+                    Name = g.Name,
+                    URL = g.URL
+
+
+                }).ToList()
+            }).FirstOrDefaultAsync();
+            
+
+
+            //System.Diagnostics.Debug.WriteLine(get_details.Gallery);
+            //for (var i= 0; i <= post.GalleryFiles.Count(); i++)
+            //{
+            //    _context.Posts.Remove(post.GalleryFiles[i]);
+            //}
+
+                // Delete old addresses explicitly:
+
+
+
+
+                if (id != post.Id)
             {
                 return NotFound();
             }

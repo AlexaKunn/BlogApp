@@ -43,6 +43,8 @@ namespace BlogApp.Controllers
                 Body = post.Body,
                 Created = post.Created,
                 ImagePath = post.ImagePath,
+                Latitude = post.Latitude,
+                Longitude = post.Longitude,
                 Gallery = post.Gallery.Select(g => new Gallery()
                 {
                     Id = g.Id,
