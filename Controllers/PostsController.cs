@@ -24,18 +24,7 @@ namespace BlogApp.Controllers
         // GET: Posts/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            //if (id == null)
-            //{
-            //    return NotFound();
-            //}
 
-
-
-            //var post = await _context.Posts
-            //    .FirstOrDefaultAsync(m => m.Id == id);
- 
-
-            //return View(post);
 
            var post = await _context.Posts.Where(x => x.Id == id).Select(post => new Post()
             {

@@ -13,7 +13,15 @@
         width: 500px;
         height: 300px;
     } */
-
+    body {
+        background-image: url("/img/details1.jpg");
+        /*   background-repeat: no-repeat; */
+        background-size: cover;
+        background-position: 50% 50%;
+        text-align: center;
+        margin: auto;
+        padding: 0;
+    }
 
     .carousel {
         width: 640px;
@@ -78,7 +86,7 @@
         <p style="white-space: pre-line" id="text">@Html.DisplayFor(model => model.Body)</p>
         </section>
 
-    <div class="col-md-10 container panel panel-default" id="map">
+@*     <div class="col-md-10 container panel panel-default" id="map">
         <div class="panel-body">
     <gmp-map center="@Html.DisplayFor(model => model.Latitude),@Html.DisplayFor(model => model.Longitude)"
              zoom="5"
@@ -97,9 +105,11 @@
       https://developers.google.com/maps/documentation/javascript/load-maps-js-api
       for more information.
       -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB7q_Ysr4VR04yePx9T3i4ODz-WyaTZOAI&libraries=maps,marker&v=beta"
-            defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&libraries=places,maps,marker&v=beta"
+            defer></script> *@
 
+
+    <script src="https://maps.googleapis.com/maps/api/place/textsearch/json?query=new+york+city+point+of+interest&language=en&key=API_KEY"></script>
     <div class="container">
         <a asp-action="Index">Back to List</a>
     </div>
